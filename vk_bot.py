@@ -3,6 +3,7 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 import config
 from user import User
+from partner import Partner
 
 user = User()
 
@@ -37,7 +38,9 @@ class VKBot:
                             self.check_user_info()
                             if len(user.birthday) > 4:
                                 user.birthday = user.birthday[6:]
-                            print(user.sex, user.relations, user.city, user.birthday)
+                            partner = Partner(user.birthday, user.city, user.sex, config.USER_TOKEN)
+                            self.write_msg(self.user_id, 'Введите ТОКЕН пользователя: ')
+                            partner.search_partner_id()
 
     def check_user_id(self, user_id):
         try:
@@ -53,7 +56,7 @@ class VKBot:
             self.write_msg(self.user_id, 'Назовите город, в котором вы проживаете.')
             user.city = self.get_more_information()
 
-        if len(user.birthday) < 10:
+        if user.birthday is None or len(user.birthday) < 10:
             self.write_msg(self.user_id, 'Назовите год своего рождения.')
             user.birthday = self.get_more_information()
 
