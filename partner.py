@@ -2,6 +2,7 @@ import datetime
 import requests
 from pprint import pprint
 from config import USER_TOKEN, api_base_url_vk
+from iterator import PartnerPhotoIterator
 
 
 class Partner:
@@ -46,14 +47,12 @@ class Partner:
             'photo_sizes': 1
         }
         partner_photo = requests.get(api_base_url_vk + 'photos.get', params=params)
-        pprint(partner_photo.json())
-        result = {photo['likes']['count']: photo['sizes'] for photo in partner_photo.json()['response']['items']
-                  if partner_photo.json()['response']['items']['sizes'][0]['type'] == 'x'}
-        return result
-
-    def sort_partner_photo(self, partner_photos):
-        for i in partner_photos:
-            print(i)
+        photo_information = partner_photo.json()['response']['items']
+        photo_list = []
+        for photo in PartnerPhotoIterator(photo_information):
+            photo_list.append(photo)
+        photo_list = sorted(photo_list, key=lambda x: x['likes'], reverse=True)
+        return photo_list
 
     def determining_the_sex_of_the_partner(self):
         sex = None

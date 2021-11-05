@@ -1,4 +1,5 @@
 import pytest
+from pprint import pprint
 from partner import Partner
 import config
 
@@ -12,5 +13,4 @@ class Test:
     def test_search_partner(self):
         partner = Partner('1988', 'калининград', 2, config.USER_TOKEN)
         i = partner.search_partner_id()[0]
-        print(partner.get_partner_photo(i))
-
+        pprint(partner.get_partner_photo(i))
