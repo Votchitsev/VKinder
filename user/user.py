@@ -1,5 +1,5 @@
 import requests
-from config import api_base_url_vk, TOKEN
+from configurations.config import api_base_url_vk, TOKEN
 
 
 class User:
@@ -19,16 +19,15 @@ class User:
         }
 
         user_info = requests.get(api_base_url_vk + 'users.get', params=params)
-
+        print()
         try:
             self.sex = user_info.json()['response'][0]['sex']
             self.birthday = user_info.json()['response'][0]['bdate']
-            self.city = user_info.json()['response'][0]['sity']
+            self.city = user_info.json()['response'][0]['city']['id']
 
         except KeyError as key:
             if key == 'city':
                 self.city = None
-
 
 
 

@@ -1,7 +1,6 @@
-import pytest
-from pprint import pprint
-from partner import Partner
-import config
+from partner.partner import Partner
+from configurations import config
+from city import cyties
 
 
 class Test:
@@ -11,6 +10,11 @@ class Test:
         assert partner.count_partner_age() == 33
 
     def test_search_partner(self):
-        partner = Partner('1988', 'калининград', 2, config.USER_TOKEN)
-        i = partner.search_partner_id()[0]
-        pprint(partner.get_partner_photo(i))
+        partner = Partner('1988', 'калининград', 1, config.USER_TOKEN)
+        i = partner.search_partner_id()
+        partner.get_partner_photo(i)
+
+    def test_city(self):
+        city = cyties.City('калининград')
+        print(city.get_cities())
+

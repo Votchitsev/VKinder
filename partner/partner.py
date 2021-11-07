@@ -1,14 +1,13 @@
 import datetime
 import requests
-from pprint import pprint
-from config import USER_TOKEN, api_base_url_vk
-from iterator import PartnerPhotoIterator
+from configurations.config import api_base_url_vk
+from partner.iterator import PartnerPhotoIterator
 
 
 class Partner:
     def __init__(self, birthday, city, sex, token):
         self.token = token
-        self.relation = [0, 1, 6]
+        self.relation = 6
         self.birthday = birthday
         self.city = city
         self.user_sex = sex
@@ -22,19 +21,21 @@ class Partner:
     def search_partner_id(self):
         params = {
             'access_token': self.token,
-            'count': '1',
-            'hometown': self.city,
+            'count': 1000,
+            'city': self.city,
             'sex': self.determining_the_sex_of_the_partner(),
             'status': self.relation,
             'v': '5.131',
             'age_from': self.count_partner_age() - 3,
             'age_to': self.count_partner_age() + 3,
-            'has_photo': '1'
+            'has_photo': '1',
+            'sort': '0',
         }
 
         partner_info = requests.get(api_base_url_vk + 'users.search', params=params)
-        partner_id_list = tuple(partner_id['id'] for partner_id in partner_info.json()['response']['items'])
-        return partner_id_list
+        partner_id = partner_info.json()['response']['items']
+        list_of_open_accounts = [account['id'] for account in partner_id if account['is_closed'] is False]
+        return list_of_open_accounts
 
     def get_partner_photo(self, owner_id):
         params = {
@@ -56,9 +57,8 @@ class Partner:
 
     def determining_the_sex_of_the_partner(self):
         sex = None
-        if self.user_sex == '1':
-            sex = '2'
-        elif self.user_sex == '2':
-            sex = '1'
-
+        if self.user_sex == 1:
+            sex = 2
+        elif self.user_sex == 2:
+            sex = 1
         return sex

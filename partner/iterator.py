@@ -11,9 +11,6 @@ class PartnerPhotoIterator:
         if self.cursor == self.stop:
             raise StopIteration
         likes = self.data[self.cursor]['likes']['count']
-        link = None
-        for i in self.data[self.cursor]['sizes']:
-            if i['type'] == 'x':
-                link = i['url']
+        media_id = self.data[self.cursor]['id']
         self.cursor += 1
-        return {'likes': likes, 'link': link}
+        return {'likes': likes, 'id': media_id}
