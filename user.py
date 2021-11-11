@@ -19,7 +19,7 @@ class User:
         }
 
         user_info = requests.get(api_base_url_vk + 'users.get', params=params)
-        print()
+
         try:
             self.sex = user_info.json()['response'][0]['sex']
             self.birthday = user_info.json()['response'][0]['bdate']
@@ -28,6 +28,3 @@ class User:
         except KeyError as key:
             if key == 'city':
                 self.city = None
-
-
-
