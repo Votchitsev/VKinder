@@ -18,6 +18,20 @@ class City:
             'count': 1,
             'q': self.city_name
         }
+
         response = requests.get(api_base_url_vk + 'database.getCities', params=params)
-        city_id = response.json()['response']['items'][0]['id']
-        return city_id
+
+        if response.json()['response']['count'] == 0:
+            return None
+        else:
+            city_id = response.json()['response']['items'][0]['id']
+            return city_id
+
+    def check_city(self):
+
+        result = self.get_cities()
+
+        if result is None:
+            return False
+        else:
+            return True

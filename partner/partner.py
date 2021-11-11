@@ -28,8 +28,8 @@ class Partner:
             'v': '5.131',
             'age_from': self.count_partner_age() - 3,
             'age_to': self.count_partner_age() + 3,
-            'has_photo': '1',
-            'sort': '0',
+            'has_photo': 1,
+            'sort': 0,
         }
 
         partner_info = requests.get(api_base_url_vk + 'users.search', params=params)
@@ -38,21 +38,25 @@ class Partner:
         return list_of_open_accounts
 
     def get_partner_photo(self, owner_id):
+
         params = {
             'access_token': self.token,
             'v': '5.131',
             'owner_id': owner_id,
             'album_id': 'profile',
-            'extended': '1',
-            'count': '1000',
+            'extended': 1,
+            'count': 3,
             'photo_sizes': 1
         }
+
         partner_photo = requests.get(api_base_url_vk + 'photos.get', params=params)
         photo_information = partner_photo.json()['response']['items']
+
         photo_list = []
         for photo in PartnerPhotoIterator(photo_information):
             photo_list.append(photo)
-        photo_list = sorted(photo_list, key=lambda x: x['likes'], reverse=True)
+
+        photo_list = sorted(photo_list, key=lambda x: x['likes_and_comments'], reverse=True)
         return photo_list
 
     def determining_the_sex_of_the_partner(self):
