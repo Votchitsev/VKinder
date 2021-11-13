@@ -1,32 +1,25 @@
 import random
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
+
+from vkinder_bot.choose_partner import choose_partner
 from configurations import config
-from user import User
-from partner.partner import Partner
-from cyties import City
+from vkinder_bot.user import User
+from vkinder_bot.partner.partner import Partner
+from vkinder_bot.cities import City
 from configurations.check_token import check_token
 import requests
 from configurations.config import api_base_url_vk
 from data.insert import insert
-from data.check import check
 
 
 user = User()
 
 
-def choose_partner(partner_list: list):
-    for partner in partner_list:
-        if check(user.id, partner):
-            return partner
-        else:
-            pass
-
-
 class VKBot:
 
     def __init__(self):
-        self.token = config.TOKEN
+        self.token = config.access_token
         self.vk = vk_api.VkApi(token=config.TOKEN)
         self.longpoll = VkLongPoll(self.vk)
         self.user_id = None
@@ -42,7 +35,7 @@ class VKBot:
                 self.user_id = event.user_id
                 if event.to_me:
                     message = event.message
-                    if not check_token(config.USER_TOKEN):
+                    if not check_token(config.access_token):
                         self.insert_new_token()
                     if message == 'Начать':
                         self.write_msg(self.user_id,
@@ -56,10 +49,10 @@ class VKBot:
 
                             self.retrieving_user_information(user_id)
 
-                            partner = Partner(user.birthday, user.city, user.sex, config.USER_TOKEN)
+                            partner = Partner(user.birthday, user.city, user.sex, config.access_token)
                             partner_list = partner.search_partner_id()
 
-                            partner_id = choose_partner(partner_list)
+                            partner_id = choose_partner(partner_list, user.id)
 
                             partner_photos = partner.get_partner_photo(partner_id)
                             self.sending_found_partners(partner_id, partner_photos)
@@ -95,12 +88,17 @@ class VKBot:
             self.write_msg(self.user_id, 'Назовите год своего рождения.')
 
             while True:
+
                 birthday = self.get_more_information()
-                if len(birthday) == 4 or birthday < 1940:
-                    user.birthday = birthday
-                    break
+
+                if birthday.isdigit():
+                    if len(birthday) == 4 and int(birthday) > 1940:
+                        user.birthday = birthday
+                        break
+                    else:
+                        self.write_msg(self.user_id, 'Неверный формат! Введите заново.')
                 else:
-                    self.write_msg(self.user_id, 'Неверный формат! Введите заново.')
+                    self.write_msg(self.user_id, 'Дата должна состоять из одних цифр')
 
         else:
             user.birthday = user.birthday[6:]
@@ -122,11 +120,11 @@ class VKBot:
                            attachment=f'photo{partner_id}_{photo["id"]}')
 
     def insert_new_token(self):
-        while not check_token(config.USER_TOKEN):
+        while not check_token(config.access_token):
             self.write_msg(self.user_id, 'Введите актуальный ТОКЕН: ')
             new_token = self.get_more_information()
             config.USER_TOKEN = new_token
-            check_token(config.USER_TOKEN)
+            check_token(config.access_token)
         self.write_msg(self.user_id, 'Токен получен ...')
 
     def retrieving_user_information(self, user_id):

@@ -1,6 +1,6 @@
 import requests
 
-from configurations.config import api_base_url_vk, USER_TOKEN
+from configurations.config import api_base_url_vk, access_token
 
 
 class City:
@@ -11,7 +11,7 @@ class City:
 
     def get_cities(self):
         params = {
-            'access_token': USER_TOKEN,
+            'access_token': access_token,
             'country_id': 1,
             'v': '5.131',
             'need_all': 1,

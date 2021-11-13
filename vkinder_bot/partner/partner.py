@@ -1,7 +1,7 @@
 import datetime
 import requests
 from configurations.config import api_base_url_vk
-from partner.iterator import PartnerPhotoIterator
+from vkinder_bot.partner.iterator import PartnerPhotoIterator
 
 
 class Partner:
@@ -19,6 +19,7 @@ class Partner:
         return user_age
 
     def search_partner_id(self):
+
         params = {
             'access_token': self.token,
             'count': 1000,

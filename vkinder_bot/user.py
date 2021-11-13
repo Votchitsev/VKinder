@@ -1,5 +1,5 @@
 import requests
-from configurations.config import api_base_url_vk, TOKEN
+from configurations.config import api_base_url_vk, access_token
 
 
 class User:
@@ -12,7 +12,7 @@ class User:
 
     def get_self_user_info(self):
         params = {
-            'access_token': TOKEN,
+            'access_token': access_token,
             'user_ids': self.id,
             'v': '5.131',
             'fields': 'sex, bdate, relation, city'
