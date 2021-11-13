@@ -1,6 +1,6 @@
 from partner.partner import Partner
 from configurations import config
-from city import cyties
+import cyties
 
 
 class Test:
