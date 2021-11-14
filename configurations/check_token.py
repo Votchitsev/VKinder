@@ -15,7 +15,6 @@ def check_token(token):
     determination_error_or_not = list(response)
 
     if determination_error_or_not[0] == 'error':
-        print(response['error']['error_msg'])
         return False
     elif determination_error_or_not[0] == 'response':
         return True

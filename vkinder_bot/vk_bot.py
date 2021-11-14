@@ -11,7 +11,7 @@ from configurations.check_token import check_token
 import requests
 from configurations.config import api_base_url_vk
 from data.insert import insert
-
+import datetime
 
 user = User()
 
@@ -35,8 +35,10 @@ class VKBot:
                 self.user_id = event.user_id
                 if event.to_me:
                     message = event.message
+
                     if not check_token(config.access_token):
-                        self.insert_new_token()
+                        self.token = self.insert_new_token()
+
                     if message == 'Начать':
                         self.write_msg(self.user_id,
                                        'Введите  ID пользователя ВКонтакте, для которого хотите найти пару:  ')
@@ -49,10 +51,10 @@ class VKBot:
 
                             self.retrieving_user_information(user_id)
 
-                            partner = Partner(user.birthday, user.city, user.sex, config.access_token)
+                            partner = Partner(user.birthday, user.city, user.sex, self.token)
                             partner_list = partner.search_partner_id()
 
-                            partner_id = choose_partner(partner_list, user.id)
+                            partner_id = choose_partner(partner_list, user.id, user.city, self.token)
 
                             partner_photos = partner.get_partner_photo(partner_id)
                             self.sending_found_partners(partner_id, partner_photos)
@@ -61,6 +63,7 @@ class VKBot:
                             insert(user.id, partner_id, partner_first_name, partner_last_name)
 
                             user.city = None
+                            user.birthday = None
 
     def check_user_id(self, user_id):
         try:
@@ -77,7 +80,7 @@ class VKBot:
 
             while True:
                 user_city_tittle = self.get_more_information()
-                city = City(user_city_tittle)
+                city = City(user_city_tittle, self.token)
                 if city.check_city():
                     user.city = city.get_cities()
                     break
@@ -92,11 +95,12 @@ class VKBot:
                 birthday = self.get_more_information()
 
                 if birthday.isdigit():
-                    if len(birthday) == 4 and int(birthday) > 1940:
+                    if len(birthday) == 4 and (datetime.datetime.now().year - 18) > int(birthday) > 1940:
                         user.birthday = birthday
                         break
                     else:
-                        self.write_msg(self.user_id, 'Неверный формат! Введите заново.')
+                        self.write_msg(self.user_id, 'Неверный формат даты, либо вы слишком малы/стары для этого! '
+                                                     'Введите заново.')
                 else:
                     self.write_msg(self.user_id, 'Дата должна состоять из одних цифр')
 
@@ -120,16 +124,18 @@ class VKBot:
                            attachment=f'photo{partner_id}_{photo["id"]}')
 
     def insert_new_token(self):
-        while not check_token(config.access_token):
+
+        while not check_token(self.token):
             self.write_msg(self.user_id, 'Введите актуальный ТОКЕН: ')
             new_token = self.get_more_information()
-            config.USER_TOKEN = new_token
+            self.token = new_token
             check_token(config.access_token)
-        self.write_msg(self.user_id, 'Токен получен ...')
+
+        return self.token
 
     def retrieving_user_information(self, user_id):
         user.id = user_id
-        user.get_self_user_info()
+        user.get_self_user_info(self.token)
         self.check_user_info()
 
     def get_partner_name(self, partner_id):

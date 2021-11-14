@@ -1,11 +1,11 @@
 import requests
-from configurations.config import access_token, api_base_url_vk
+from configurations.config import api_base_url_vk
 
 
-def check_partner_city(partner_id, user_city_id):
+def check_partner_city(partner_id, user_city_id, token):
 
     params = {
-        'access_token': access_token,
+        'access_token': token,
         'fields': 'city',
         'v': '5.131',
         'user_ids': partner_id

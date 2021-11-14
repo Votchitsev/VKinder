@@ -1,5 +1,6 @@
 import requests
-from configurations.config import api_base_url_vk, access_token
+
+from configurations.config import api_base_url_vk
 
 
 class User:
@@ -10,7 +11,8 @@ class User:
         self.sex = None
         self.city = None
 
-    def get_self_user_info(self):
+    def get_self_user_info(self, access_token):
+
         params = {
             'access_token': access_token,
             'user_ids': self.id,

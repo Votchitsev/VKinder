@@ -3,6 +3,7 @@ from data.tables import PartnersBase
 
 
 def check(searcher_id, partner_id):
+
     session = Session()
 
     partners = session.query(PartnersBase).filter(
